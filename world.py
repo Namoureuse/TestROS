@@ -3,8 +3,8 @@
 # This code is used to teach Developmental AI.
 # from turtlesim_enacter import TurtleSimEnacter # requires ROS
 from turtlepy_enacter import TurtlePyEnacter
-from Agent5 import Agent5
-from OsoyooCarEnacter import OsoyooCarEnacter
+# from Agent5 import Agent5
+# from OsoyooCarEnacter import OsoyooCarEnacter
 ROBOT_IP = "192.168.4.1"
 
 
@@ -14,6 +14,11 @@ class Agent:
         self.valence_table = valence_table
         self._action = None
         self.anticipated_outcome = None
+        
+        self.count_good_pred = 0
+        self.bored_level = 4
+        self.prev_outcomes = {}
+        self.prev_action = 0
 
     def action(self, outcome):
         """ tracing the previous cycle """
@@ -25,10 +30,35 @@ class Agent:
                   ", valence: " + str(self.valence_table[self._action][outcome]) + ")")
 
         """ Computing the next action to enact """
+        
+        # Mémorisation outcome
+        if self._action is not None:
+            self.prev_outcomes[self._action] = outcome
+            if self.anticipated_outcome == outcome:
+                self.count_good_pred += 1
+        
         # TODO: Implement the agent's decision mechanism
-        self._action = 0
+        self._action = self.prev_action
+        
+        best_valence = -1
+        for a,o in self.prev_outcomes.items():
+            valence = self.valence_table[a][o]
+            if valence > best_valence:
+                best_valence = valence
+                self._action = a      
+        if self._action != self.prev_action:
+            self.count_good_pred = 0
+        
+        if self.count_good_pred >= self.bored_level:
+            self._action = (self.prev_action+1) % 2
+            self.count_good_pred = 0
+            
+        self.prev_action = self._action
+        
         # TODO: Implement the agent's anticipation mechanism
         self.anticipated_outcome = 0
+        if self._action in self.prev_outcomes:
+            self.anticipated_outcome = self.prev_outcomes[self._action]
         return self._action
 
 
@@ -66,14 +96,14 @@ class Environment3:
 
 
 # TODO Define the valance of interactions (action, outcome)
-valences = [[-1, 1], [-1, 1]]
-# valences = [[1, -1], [1, -1]]
+# valences = [[-1, 1], [-1, 1]]
+valences = [[1, -1], [1, -1]]
 # TODO Choose an agent
 a = Agent(valences)
 # a = Agent5(valences)
 # TODO Choose an environment
-e = Environment1()
-# e = Environment2()
+# e = Environment1()
+e = Environment2()
 # e = Environment3()
 # e = TurtleSimEnacter()
 # e = TurtlePyEnacter()
