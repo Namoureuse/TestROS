@@ -96,15 +96,15 @@ class Environment3:
 
 
 # TODO Define the valance of interactions (action, outcome)
-# valences = [[-1, 1], [-1, 1]]
-valences = [[1, -1], [1, -1]]
+valences = [[-1, 1], [-1, 1]]
+# valences = [[1, -1], [1, -1]]
 # TODO Choose an agent
 a = Agent(valences)
 # a = Agent5(valences)
 # TODO Choose an environment
 # e = Environment1()
-e = Environment2()
-# e = Environment3()
+# e = Environment2()
+e = Environment3()
 # e = TurtleSimEnacter()
 # e = TurtlePyEnacter()
 # e = OsoyooCarEnacter(ROBOT_IP)
